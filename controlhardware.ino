@@ -24,37 +24,26 @@ void loadServo(int angle, int duration){
   myServo.detach();
 }
 
-//Blinks depending on the status.
-//0 = nothing of note is happening, 1 = the button has been pressed, one blink.
-//2 = a high score has been registered, two blinks, 3 = page failed to load, three blinks.
-void LED(int statuscode, int duration){
-  //Blinks the LED for a number of times depending on the status code.
-  for(int i = 0; i < statuscode; i++){
-    digitalWrite(LEDpin, HIGH);
-    delay(duration);
-    digitalWrite(LEDpin, LOW);
-    //If there is more, delay before restarting sequence.
-    if(statuscode != i){
-      delay(duration);
-    }
-  }
-}
-
 //Called on startup.
 void setup() {
   pinMode(LEDpin, OUTPUT);
   pinMode(BUTTONpin, INPUT);
 
   WiFiSetup();
+  loadPage();
 }
 
 //Called constantly.
 void loop() {
   //Check if button is pressed.
   if(digitalRead(BUTTONpin) == HIGH){
-    //LED(1, 1000);
-    //loadServo(90, 2000);
-    //checkForNewScore();
+    loadPage();
   }
-  checkForNewScore();
+  //If connected (after loadPage()) then check the response.
+  if (client.connected()){
+    checkForNewScore();
+  }
+  //if(checkForNewScore()){
+  //  loadServo(90, 2000);
+  //}
 }

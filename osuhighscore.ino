@@ -12,6 +12,9 @@
 #include <WiFiSSLClient.h>
 #include <WiFiUdp.h>
 
+//Include JSON parser.
+#include <ArduinoJson.h>
+
 //WiFi settings
 #include "wificodes.h"
 int status = WL_IDLE_STATUS;     // the WiFi radio's status
@@ -41,7 +44,10 @@ void WiFiSetup(){
 
   digitalWrite(LEDpin, LOW);
   Serial.println("Successfully connected!");
+}
 
+//Loads the page and stores the output in memory, for reading in checkForNewScore().
+void loadPage(){
   char host[] = "osu.ppy.sh";
   String query = "/api/get_user?u=carlossss111";
   String apikey = "k=d053af8f95b3d2d8e6dbd502424b9b009798fbc2";
@@ -50,29 +56,38 @@ void WiFiSetup(){
   Serial.println("Connecting to: " + String(host) + endpoint + "...");
   // if you get a connection, report back via serial:
   if (client.connect(host, 80)) {
-    Serial.println("Connected to server");
+    Serial.println("Connected to server!");
     // Make a HTTP request:
     client.println("GET " + endpoint + " HTTP/1.1");
     client.println("Host: osu.ppy.sh");
-    client.println("Connection: keep-alive");
+    //client.println("Connection: keep-alive");
+    client.println("Connection: close");
     client.println();
   }
 }
 
-//Checks site for new score.
+//Checks the response of the HTTP request in loadPage().
+//Must be in the loop() function.
 bool checkForNewScore(){
-  while (client.available()) {
-    char c = client.read();
-    Serial.write(c);
+  //Reads the entire response into the rawOutput string.
+  String rawOutput = "";
+  if (client.available()){
+    rawOutput = client.readString();
   }
 
-  // if the server's disconnected, stop the client:
+  //Selects the {...} part of the output, which would be the JSON file.
+  String JSONcontent = rawOutput.substring(rawOutput.indexOf("{"), rawOutput.indexOf("}") + 1);
+  Serial.println(JSONcontent);
+  
+
+  //If the client is disconnected, end the client object.
   if (!client.connected()) {
-    Serial.println();
-    Serial.println("disconnecting from server.");
+    Serial.println("Disconnected to server.");
     client.stop();
-    while(true);
+    delay(1000);
   }
+
+  delay(1000);
   return false;
 }
 
