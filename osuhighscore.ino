@@ -1,53 +1,41 @@
-//servo library
-#include <Servo.h>
+//This file is the main, it is called first.
+//The setup and loop functions are in controlhardware.ino.
 
-//pins
-#define LEDpin 3
-#define BUTTONpin 0
-#define SERVOpin 5
+//Wifi101 library. Might not need all of these but here for safe measure.
+#include <WiFi101.h>
+#include <WiFiClient.h>
+#include <WiFiMDNSResponder.h>
+#include <WiFiServer.h>
+#include <WiFiSSLClient.h>
+#include <WiFiUdp.h>
 
-//servo object initialised
-Servo myServo;
+//WiFi settings
+#include "wificodes.h"
+int status = WL_IDLE_STATUS;     // the WiFi radio's status
 
-//Rotates the servo to a position for a duration of time, then rotates back to 0.
-void loadServo(int angle, int duration){
-  myServo.attach(SERVOpin);
-  myServo.write(angle);
-  delay(1200);//Delay while the servo is rotating.
-  delay(duration);//Holds position for a duration.
-  myServo.write(0);
-  delay(1200);//Delay again while the servo is rotating.
-  myServo.detach();
-}
-
-//Blinks depending on the status.
-//0 = nothing of note is happening.
-//1 = the button has been pressed, one blink.
-//2 = a high score has been registered, two blinks.
-//3 = page failed to load, three blinks.
-void LED(int statuscode, int duration){
-  //Blinks the LED for a number of times depending on the status code.
-  for(int i = 0; i < statuscode; i++){
-    digitalWrite(LEDpin, HIGH);
-    delay(duration);
-    digitalWrite(LEDpin, LOW);
-    //If there is more, delay before restarting sequence.
-    if(statuscode != i){
-      delay(duration);
-    }
+void WiFiSetup(){
+  // Initialises the serial port and waits for it.
+  Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
   }
-}
 
-//Called on startup.
-void setup() {
-  pinMode(LEDpin, OUTPUT);
-  pinMode(BUTTONpin, INPUT);
-}
+  //Attempts to connect to WPA WiFi. Repeats until successful.
+  while ( status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    //Connects using ssid and password provided in a seperate file not commited, wificodes.h.
+    status = WiFi.begin(ssid, pass);
 
-//Called constantly.
-void loop() {
-  if(digitalRead(BUTTONpin) == HIGH){
-    LED(1, 1000);
-    loadServo(90, 2000);
+    //Wait 5 seconds for connection:
+    delay(5000);
   }
+  //This point forward the device is connected to WiFi.
+
+  Serial.println("You're connected to the network");
+}
+
+bool checkForNewScore(){
+  Serial.println(WiFi.ping("www.google.com"));
+  delay(5000);
 }
