@@ -3,8 +3,10 @@
 //servo library
 #include <Servo.h>
 
+//#include "osuhighscore.ino";//This line is just to please VScode/
+
 //pins
-#define LEDpin 3
+//LED pin defined previously
 #define BUTTONpin 0
 #define SERVOpin 5
 
@@ -39,7 +41,6 @@ void LED(int statuscode, int duration){
 }
 
 //Called on startup.
-//#include "osuhighscore.ino";//This line is just to please VScode/
 void setup() {
   pinMode(LEDpin, OUTPUT);
   pinMode(BUTTONpin, INPUT);
@@ -51,10 +52,9 @@ void setup() {
 void loop() {
   //Check if button is pressed.
   if(digitalRead(BUTTONpin) == HIGH){
-    LED(1, 1000);
-    loadServo(90, 2000);
+    //LED(1, 1000);
+    //loadServo(90, 2000);
+    //checkForNewScore();
   }
-
-  //Checks for highscore using the function.
   checkForNewScore();
 }
