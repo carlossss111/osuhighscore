@@ -76,9 +76,32 @@ bool checkForNewScore(){
   }
 
   //Selects the {...} part of the output, which would be the JSON file.
-  String JSONcontent = rawOutput.substring(rawOutput.indexOf("{"), rawOutput.indexOf("}") + 1);
-  Serial.println(JSONcontent);
-  
+  String JSONresponse = rawOutput.substring(rawOutput.indexOf("{"), rawOutput.indexOf("}") + 1);
+  if(JSONresponse != ""){
+    Serial.println("Raw JSON Response: " + JSONresponse);
+  }
+
+  //Using #included arduinoJson, creates static JSON object called 'doc'.
+  StaticJsonDocument<1024> doc; 
+
+  //Assigns the JSON object doc as the deserialised JSON from JSONresponse.
+  DeserializationError err = deserializeJson(doc, JSONresponse);
+  //The incompleteInput error occors while connecting. Otherwise the error is problematic.
+  if (err) {
+    if (err.c_str() == "IncompleteInput"){
+      Serial.println("Recieving JSON...");
+    }
+    else{
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(err.c_str());
+    }
+  }
+
+  //The score, "pp", is loaded into a variable using the arduinoJson syntax.
+  int newpp = doc["pp_raw"].as<int>();
+  if (newpp > 1){
+    Serial.println("Username: " + doc["username"].as<String>() + "\nPP rank: " + doc["pp_rank"].as<int>() + "\nNew PP: " + String(newpp));
+  }
 
   //If the client is disconnected, end the client object.
   if (!client.connected()) {
