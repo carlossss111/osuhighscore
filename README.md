@@ -1,3 +1,4 @@
+[logo]: https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png
 # Osu!Highscore
 ## Overview
 The main function is that the Servo will rotate and hold a physical flag whenever the associated account reaches a highscore on the game Osu!. Targeted for the Arduino MKR1000, the code connects to the profile page, records the score, and flags if that score is updated from the last time it has been read.
