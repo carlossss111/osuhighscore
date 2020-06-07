@@ -25,11 +25,8 @@ void WiFiSetup(){
   //LED lights until connection to WiFi is established.
   digitalWrite(LEDpin, HIGH);
 
-  // Initialises the serial port and waits for it.
-  Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+  //Initialises the serial port.
+  Serial.begin(9600);//If there is no serial monitor connected, it doesn't matter, the messages go nowhere.
 
   //Attempts to connect to WPA WiFi. Repeats until successful.
   while ( status != WL_CONNECTED) {
@@ -50,9 +47,8 @@ void WiFiSetup(){
 void loadPage(){
   char host[] = "osu.ppy.sh";
   String query = "/api/get_user?u=carlossss111";
-  String apikey = "k=d053af8f95b3d2d8e6dbd502424b9b009798fbc2";
+  //apikey provided in wificodes.h
   String endpoint = query + "&" + apikey;
-  //https://osu.ppy.sh/api/get_user?u=carlossss111&k=d053af8f95b3d2d8e6dbd502424b9b009798fbc2
   Serial.println("Connecting to: " + String(host) + endpoint + "...");
   //On a connection, make the request and construct the header.
   if (client.connect(host, 80)) {
@@ -77,8 +73,10 @@ bool checkForNewScore(){
   }
 
   //Selects the {...} part of the output, which would be the JSON file.
-  String JSONresponse = rawOutput.substring(rawOutput.indexOf("{"), rawOutput.indexOf("}") + 1);
+  //Anything in events[] is cut so that there is no memory leak.
+  String JSONresponse = rawOutput.substring(rawOutput.indexOf("{"), rawOutput.indexOf("[",rawOutput.indexOf("{")) + 1);
   if(JSONresponse != ""){
+    JSONresponse += "]}";//The string has been cut short, it is ended to complete the JSON.
     Serial.println("Raw JSON Response: " + JSONresponse);
   }
 

@@ -43,8 +43,13 @@ void loop() {
   if (client.connected()){
     //If the score is a new highscore, it will return true.
     if(checkForNewScore() == true){
-      loadServo(90, 5000);
+      loadServo(90, 8000);
     }
+  }
+  else{
+    //Check the page every 4 seconds!
+    delay(4000);
+    loadPage();
   }
 
   //If the WIFI status is not 3, it has been disconnected. Restart the arduino.
