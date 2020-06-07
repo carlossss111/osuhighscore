@@ -7,10 +7,6 @@
 //Wifi101 library. Might not need all of these but here for safe measure.
 #include <WiFi101.h>
 #include <WiFiClient.h>
-#include <WiFiMDNSResponder.h>
-#include <WiFiServer.h>
-#include <WiFiSSLClient.h>
-#include <WiFiUdp.h>
 
 //Include JSON parser.
 #include <ArduinoJson.h>
@@ -46,7 +42,7 @@ void WiFiSetup(){
 //Loads the page and stores the output in memory, for reading in checkForNewScore().
 void loadPage(){
   char host[] = "osu.ppy.sh";
-  String query = "/api/get_user?u=carlossss111";
+  //querystring provided in wificodes.h
   //apikey provided in wificodes.h
   String endpoint = query + "&" + apikey;
   Serial.println("Connecting to: " + String(host) + endpoint + "...");
