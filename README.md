@@ -13,7 +13,7 @@ Being phased out:
 1. Setup the hardware.
 2. Download this software.
 3. Rename "yourcodeshere.h" to "wificodes.h".
-4. Edit the file from the previous step. The API key can querystring can be tested by appending them to osu.ppy.sh and putting the resulting string into a browser. A JSON file should be returned.
+4. Edit the file from the previous step. The API key and querystring can be tested by appending them to osu.ppy.sh and putting the resulting string into a browser. A JSON file should be returned.
 ```objectiveC
 char ssid[] = "YOUR WIFI SSID HERE";
 char pass[] = "YOUR WIFI PASSWORD HERE";
