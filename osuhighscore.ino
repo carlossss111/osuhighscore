@@ -52,20 +52,21 @@ void loadPage(){
   String query = "/api/get_user?u=carlossss111";
   String apikey = "k=d053af8f95b3d2d8e6dbd502424b9b009798fbc2";
   String endpoint = query + "&" + apikey;
-  //"/api/get_user?u=carlossss111&k=d053af8f95b3d2d8e6dbd502424b9b009798fbc2";
+  //https://osu.ppy.sh/api/get_user?u=carlossss111&k=d053af8f95b3d2d8e6dbd502424b9b009798fbc2
   Serial.println("Connecting to: " + String(host) + endpoint + "...");
-  // if you get a connection, report back via serial:
+  //On a connection, make the request and construct the header.
   if (client.connect(host, 80)) {
     Serial.println("Connected to server!");
-    // Make a HTTP request:
     client.println("GET " + endpoint + " HTTP/1.1");
     client.println("Host: osu.ppy.sh");
-    //client.println("Connection: keep-alive");
     client.println("Connection: close");
     client.println();
   }
 }
 
+
+//Stores new pp value each time it increases and uses it for comparison.
+int storedpp = 0;
 //Checks the response of the HTTP request in loadPage().
 //Must be in the loop() function.
 bool checkForNewScore(){
@@ -99,19 +100,27 @@ bool checkForNewScore(){
 
   //The score, "pp", is loaded into a variable using the arduinoJson syntax.
   int newpp = doc["pp_raw"].as<int>();
+  //If the pp value has been properly got from the host.
   if (newpp > 1){
-    Serial.println("Username: " + doc["username"].as<String>() + "\nPP rank: " + doc["pp_rank"].as<int>() + "\nNew PP: " + String(newpp));
+    Serial.println("Username: " + doc["username"].as<String>() + "\nPP rank: " + doc["pp_rank"].as<int>());
+    //If stored pp is zero, the device has just been turned on.
+    if (storedpp == 0){
+      storedpp = newpp;//Load the intial pp value.
+      Serial.println("Stored pp initialised to: " + String(storedpp));
+    }
+    else if (storedpp < newpp){
+      Serial.println("HIGHSCORE!!!\npp previously: " + String(storedpp) + "\npp now: " + String(newpp));
+      storedpp =  newpp;//Loads new pp value.
+      return true;//return true so that the servo can be run from the loop() function.
+    }
   }
 
   //If the client is disconnected, end the client object.
   if (!client.connected()) {
     Serial.println("Disconnected to server.");
     client.stop();
-    delay(1000);
   }
 
   delay(1000);
   return false;
 }
-
-//https://osu.ppy.sh/api/get_user?u=carlossss111&k=d053af8f95b3d2d8e6dbd502424b9b009798fbc2

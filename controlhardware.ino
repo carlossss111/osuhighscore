@@ -41,9 +41,21 @@ void loop() {
   }
   //If connected (after loadPage()) then check the response.
   if (client.connected()){
-    checkForNewScore();
+    //If the score is a new highscore, it will return true.
+    if(checkForNewScore() == true){
+      loadServo(90, 5000);
+    }
   }
-  //if(checkForNewScore()){
-  //  loadServo(90, 2000);
-  //}
+
+  //If the WIFI status is not 3, it has been disconnected. Restart the arduino.
+  if (status != 3){
+    Serial.println("\nWIFI HAS BEEN DISCONNECTED UNEXPECTEDLY!\nPlease reset the Arduino.");
+    while(true){
+      digitalWrite(LEDpin, HIGH);
+      delay(500);
+      digitalWrite(LEDpin, LOW);
+      delay(500);
+    }
+  }
+
 }
