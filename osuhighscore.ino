@@ -1,8 +1,57 @@
-//This file is the main, it is called first.
-//The setup and loop functions are in controlhardware.ino.
+/*FIRST PART OF INSTRUCTION
+* The pp is output onto a display.
+* displaySetup() is called by setup() sets up the display.
+* displayScore() is called by checkForNewScore() and displays the score.
+*/
+#include <TM1637Display.h>
+#define CLK 3
+#define DIO 2
+TM1637Display display(CLK, DIO);
 
-//For status updates
-#define LEDpin 3
+//On setup, have the display say "load"ing.
+void displaySetup(){
+
+  //Segments for loading.
+  const uint8_t loading[] = {
+  SEG_F | SEG_E | SEG_D,                           // L
+  SEG_G | SEG_C | SEG_D | SEG_E ,                  // o
+  SEG_E | SEG_F | SEG_G | SEG_B | SEG_C | SEG_A,   // A
+  SEG_B | SEG_C | SEG_D | SEG_E | SEG_G,           // d
+  };
+
+  display.clear();
+  display.setBrightness(7);//0-7
+  display.setSegments(loading);
+}
+
+//Called each time there is a new score.
+void displayScore(int score){
+  display.showNumberDec(score);
+}
+
+//Displays an error message
+void displayError(){
+
+  //Segments for errors.
+  const uint8_t error[] = {
+  SEG_E | SEG_F | SEG_A | SEG_G | SEG_D,    // E
+  SEG_E | SEG_G,                            // r
+  SEG_E | SEG_G,                            // r
+  SEG_D,                                    // _
+  };
+
+  display.setSegments(error);
+  //More error handling WIP...
+}
+
+/*SECOND PART OF INSTRUCTION
+* Everything in this part deals with connecting to WiFI and the server.
+* Wificodes.h is required.
+* WifiSetup() is called from setup(), it connects to a WPA network.
+* loadPage() is called every 4 seconds (while the not already connected to the server). It connects to the server.
+* checkForNewScore() is called whenever the loadPage() function has successfully connected to the server,
+*    -it requests the output from the server, parses it and returns true only if the score has changed from last time.
+*/
 
 //Wifi101 library. Might not need all of these but here for safe measure.
 #include <WiFi101.h>
@@ -17,16 +66,12 @@ int status = WL_IDLE_STATUS;     // the WiFi radio's status
 WiFiClient client; //initialise client object.
 
 void WiFiSetup(){
-
-  //LED lights until connection to WiFi is established.
-  digitalWrite(LEDpin, HIGH);
-
   //Initialises the serial port.
   Serial.begin(9600);//If there is no serial monitor connected, it doesn't matter, the messages go nowhere.
 
   //Attempts to connect to WPA WiFi. Repeats until successful.
   while ( status != WL_CONNECTED) {
-    Serial.println("Attempting to connect to WPA SSID: " + String(ssid) + "...");
+    Serial.println("Attempting to connect to SSID: " + String(ssid) + "...");
     //Connects using ssid and password provided in a seperate file not commited, wificodes.h.
     status = WiFi.begin(ssid, pass);
 
@@ -34,8 +79,6 @@ void WiFiSetup(){
     delay(5000);
   }
   //This point forward the device is connected to WiFi.
-
-  digitalWrite(LEDpin, LOW);
   Serial.println("Successfully connected!");
 }
 
@@ -89,6 +132,7 @@ bool checkForNewScore(){
     else{
       Serial.print(F("deserializeJson() failed: "));
       Serial.println(err.c_str());
+      displayError();
     }
   }
 
@@ -107,6 +151,9 @@ bool checkForNewScore(){
       storedpp =  newpp;//Loads new pp value.
       return true;//return true so that the servo can be run from the loop() function.
     }
+
+    //Load display
+    displayScore(newpp);
   }
 
   //If the client is disconnected, end the client object.
@@ -117,4 +164,56 @@ bool checkForNewScore(){
 
   delay(1000);
   return false;
+}
+
+
+/*THIRD PART OF THE INSTRUCTION
+* This part has the servo function, aswell as the setup and loop functions that call all the other functions.
+* loadServo(angle, duration) is called whenever checkForNewScore() is true, it turns the servo.
+* setup() is called on startup, it calls the WifiSetup() (and secondarily loadPage() for the first time).
+* loop() is called repeatedly, it loads the page if not loaded already, and checks for the score if the already loaded.
+*/
+
+//servo library
+#include <Servo.h>
+
+//pins
+//LED pin defined previously
+#define SERVOpin 5
+
+//servo object initialised
+Servo myServo;
+
+//Rotates the servo to a position for a duration of time, then rotates back to 0.
+void loadServo(int angle, int duration){
+  myServo.attach(SERVOpin);
+  myServo.write(angle);
+  delay(1200);//Delay while the servo is rotating.
+  delay(duration);//Holds position for a duration.
+  myServo.write(0);
+  delay(1200);//Delay again while the servo is rotating.
+  myServo.detach();
+}
+
+//Called on startup.
+void setup() {
+  displaySetup();
+  WiFiSetup();
+  loadPage();
+}
+
+//Called constantly.
+void loop() {
+  //If connected (after loadPage()) then check the response.
+  if (client.connected()){
+    //If the score is a new highscore, it will return true.
+    if(checkForNewScore() == true){
+      loadServo(90, 8000);
+    }
+  }
+  else{
+    //Check the page every 4 seconds!
+    delay(4000);
+    loadPage();
+  }
 }

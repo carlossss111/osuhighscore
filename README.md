@@ -6,13 +6,14 @@ The main function is that the Servo will rotate and hold a physical flag wheneve
 Main:
 * Arduino MKR1000 (or any similiar wifi enabled board).
 * Servo, connected to a PWD pin (5), VCC and GND. Include a 100μF capacitor in parrallel with the VCC and GND.
+
 Being phased out:
 * LED, connected to a digital pin (3) and GND through a 220ohm resistor.
 * Button, connected to VCC, GND (with pulldown resistor) and a digital pin (0).
 ## Usage
 1. Setup the hardware.
 2. Download this software.
-3. Rename "yourcodeshere.h" to "wificodes.h".
+3. Rename `yourcodeshere.h` to `wificodes.h`.
 4. Edit the file from the previous step. The API key and querystring can be tested by appending them to osu.ppy.sh and putting the resulting string into a browser. A JSON file should be returned.
 ```objectiveC
 char ssid[] = "YOUR WIFI SSID HERE";
@@ -26,12 +27,13 @@ String keyIndex = 0;//<--Enter an integer only for WEP connections, see next par
 status = WiFi.begin(ssid); //FOR NO ENCRYPTION.
 status = WiFi.begin(ssid, keyIndex, key); //FOR WEP ENCRYPTION.
 ```
-6. Upload the code to the arduino and make some good Osu! plays.
+6. Download the dependencies in the section below.
+7. Upload the code. Check everything works using the serial monitor. Once connected to WiFi it should print out some details from your profile every few seconds.
+8. Make some good Osu! plays.
 ## Dependencies
 All of the dependencies are available for download in the Arduino IDE library manager.
 * Servo (usually pre-installed) (https://www.arduino.cc/en/Reference/Servo)
 * WiFi101 (https://www.arduino.cc/en/Reference/WiFi101)
 * ArduinoJson (https://github.com/bblanchon/ArduinoJson)
-
 ## Software
 The software is very WIP, I'll update this shortly.
