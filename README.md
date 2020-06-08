@@ -7,9 +7,8 @@ Main:
 * Arduino MKR1000 (or any similiar wifi enabled board).
 * Servo, connected to a PWD pin (5), VCC and GND. Include a 100μF capacitor in parrallel with the VCC and GND.
 
-Being phased out:
-* LED, connected to a digital pin (3) and GND through a 220ohm resistor.
-* Button, connected to VCC, GND (with pulldown resistor) and a digital pin (0).
+Optional
+* TM1637 Display, connected to VCC, GND, CLK > 3, DI0 > 2. If you do not want to include this, remove the instances of display functions.
 ## Usage
 1. Setup the hardware.
 2. Download this software.
@@ -35,5 +34,6 @@ All of the dependencies are available for download in the Arduino IDE library ma
 * Servo (usually pre-installed) (https://www.arduino.cc/en/Reference/Servo)
 * WiFi101 (https://www.arduino.cc/en/Reference/WiFi101)
 * ArduinoJson (https://github.com/bblanchon/ArduinoJson)
+* TM1637 Display (https://github.com/avishorp/TM1637)
 ## Software
 The software is very WIP, I'll update this shortly.
