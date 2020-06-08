@@ -36,4 +36,10 @@ All of the dependencies are available for download in the Arduino IDE library ma
 * ArduinoJson (https://github.com/bblanchon/ArduinoJson)
 * TM1637 Display (https://github.com/avishorp/TM1637)
 ## Software
-The software is very WIP, I'll update this shortly.
+The code is currently split up into three main parts.
+1. Display
+2. WiFi & Server
+3. Servo, setup and loop.
+The Display part has functions called by the WiFi and Servers part that update the display to show the appropriate score or message. If you would not like to include the display, this section and any references to it can simply be removed and the rest will work fine. The WiFi and Server part has functions called by the Setup and Loop, it is responsible for connecting to WiFi, the server and retrieving the JSON response. The final section is responsible for controlling the servo when the score changes, and also for calling everything else.
+## Result
+![result](./result.jpg "result")
